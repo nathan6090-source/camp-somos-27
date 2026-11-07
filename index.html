@@ -43,9 +43,9 @@ const CONFIG = {
   slogan: "Ministério de Jovens",
   chamada: "Quatro dias para viver algo novo com Deus e com a sua geração.",
   data: "6 a 9 de fevereiro de 2027",
-  local: "Nome do local — Cidade/UF",
-  whatsapp: "5563900000000",
-  instagram: "https://instagram.com/seu_perfil",
+  local: "Araguaína - TO",
+  whatsapp: "5563992310667",
+  instagram: "https://www.instagram.com/somos.aux",
   // Seus combos. "link" = link de pagamento (cartão/Pix) de cada combo
   combos: [
     {nome: "Crédito individual", desc: "1 vaga • cartão de crédito parcelado", preco: 250, botao: "💳 Pagar com cartão", link: "https://payment-link-v3.ton.com.br/pl_96xvry8Dedq1EVxclSkJPVQXaMo2NzpA"},
@@ -57,9 +57,9 @@ const CONFIG = {
     {t: "Comunhão", d: "Amizades que ficam depois do camp."}
   ],
   faq: [
-    {q: "O que está incluso?", a: "Edite aqui: hospedagem, alimentação, camiseta, etc."},
+    {q: "O que está incluso?", a: "Hospedagem por 4 dias, alimentação e suporte durante todo o camp."},
     {q: "Posso parcelar?", a: "Sim, no cartão de crédito, conforme o checkout."},
-    {q: "Menores de idade precisam de autorização?", a: "Edite aqui com a regra de vocês."}
+    {q: "Menores de idade precisam de autorização?", a: "Sim. Menores de idade precisam de uma autorização dos seus responsáveis."}
   ]
 };
 </script>
@@ -85,6 +85,8 @@ const CONFIG = {
 <section id="combos"><div class="wrap"><h2>Escolha seu método de pagamento</h2>
   <div class="grid" id="comboGrid"></div>
   <p style="color:var(--mut);font-size:.85rem;margin-top:14px">Pagamento seguro, processado pela Stone. Dúvidas? <a id="zap" target="_blank" rel="noopener">Fale no WhatsApp</a>.</p>
+  <div class="card" style="margin-top:22px"><h3>Já fez o pagamento?</h3><p style="color:var(--mut)">Gere agora o seu comprovante de inscrição. A confirmação do pagamento é feita pela organização, e você recebe o comprovante confirmado pelo WhatsApp.</p>
+  <form class="f2" onsubmit="return false"><input id="pNome" placeholder="Nome completo" autocomplete="name"><input id="pTel" placeholder="Seu WhatsApp com DDD" inputmode="tel" autocomplete="tel"><select id="pForma"><option>Cartão de crédito</option><option>Pix</option></select><button class="btn" id="pGerar">Gerar comprovante</button></form></div>
 </div></section>
 
 <section><div class="wrap"><h2>Perguntas frequentes</h2><div id="faq"></div></div></section>
@@ -98,6 +100,10 @@ const CONFIG = {
 <style>#pixm{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;padding:20px;z-index:20}#pixm .box{background:var(--card);border-radius:24px;padding:26px 22px;max-width:380px;width:100%;text-align:center;max-height:100%;overflow:auto}#qr{background:#fff;padding:12px;border-radius:14px;display:inline-block;margin:12px 0}#pixc{word-break:break-all;font-size:.72rem;color:var(--mut);background:#0b0d10;border-radius:10px;padding:10px;margin:10px 0;max-height:80px;overflow:auto}</style>
 <div id="pixm" onclick="if(event.target===this)this.style.display='none'"><div class="box"><h3 style="margin:0">Pagar com Pix</h3><div class="price" id="pixv" style="font-size:2rem"></div><div id="qr"></div><div id="pixc"></div><button class="btn" id="pixb">Copiar código Pix</button> <button class="btn alt" onclick="document.getElementById('pixm').style.display='none'">Fechar</button><p style="color:var(--mut);font-size:.8rem;margin:12px 0 0">No app do seu banco, escolha Pix e leia o QR Code ou use “Pix copia e cola”. Depois envie o comprovante pelo WhatsApp.</p></div></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>.f2{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-top:12px}.f2 input,.f2 select{width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:#0b0d10;color:var(--txt);font:inherit;font-size:.9rem}
+#cm{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;overflow:auto;z-index:40;padding:16px}#cm .bar{max-width:620px;margin:0 auto 12px;display:flex;gap:8px;flex-wrap:wrap}
+@media print{body.pc>*:not(#cm){display:none!important}body.pc #cm{display:block!important;position:static;background:none;padding:0;overflow:visible}#cm .bar{display:none}#cmd{padding:0!important;border-radius:0!important}}</style>
+<div id="cm"><div class="bar"><button class="btn sm" id="cPrint">🖨 Imprimir / salvar PDF</button><button class="btn sm" id="cDown">⬇ Baixar arquivo</button><button class="btn sm" id="cZap">📲 Enviar à organização</button><button class="btn alt sm" id="cClose">Fechar</button></div><div id="cmd"></div></div>
 <div id="toast"></div>
 
 <script>
@@ -119,6 +125,27 @@ $('faq').innerHTML=CONFIG.faq.map(f=>`<details><summary>${esc(f.q)}</summary><p>
 function renderCombos(){
   $('comboGrid').innerHTML=combos.map((c,i)=>`<div class="card combo"><h3>${esc(c.nome)}</h3><span style="color:var(--mut)">${esc(c.desc)}</span><div class="price">${R(c.preco)}</div><button class="btn" onclick="pagar(${i})">${esc(c.botao||'Garantir vaga')}</button></div>`).join('');
 }
+const CCSS='#cmd{background:#fff;color:#111;max-width:620px;margin:0 auto;padding:28px;border-radius:8px;font:13px/1.45 Arial,sans-serif}#cmd h1{font-size:19px;margin:0}#cmd .ch{display:flex;gap:14px;align-items:center;border-bottom:3px solid #ffaa0a;padding-bottom:10px;margin-bottom:12px}#cmd .cg{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}#cmd .s2{grid-column:span 2}#cmd label{font-size:10px;text-transform:uppercase;color:#555;display:block}#cmd .cst{display:inline-block;background:#fef3c7;color:#92400e;font-weight:700;padding:7px 14px;border-radius:99px}#cmd .cb{margin:14px 0;padding:10px;background:#fff7e0;border-radius:8px}';
+document.head.appendChild(Object.assign(document.createElement('style'),{textContent:CCSS}));
+let cpr='',cmsg='';
+function gerarCompr(){const n=$('pNome').value.trim(),t=$('pTel').value.replace(/\D/g,'');
+  if(n.length<5||t.length<10){toast('Informe nome completo e WhatsApp com DDD.');return}
+  const forma=$('pForma').value,c=combos.find(x=>forma==='Pix'?x.pix:!x.pix)||combos[0];
+  cpr='S27-'+Date.now().toString(36).slice(-4).toUpperCase()+Math.random().toString(36).slice(2,4).toUpperCase();
+  const dt=new Date().toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'});
+  cmsg='Olá! Fiz minha inscrição no '+CONFIG.nome+'.\nNome: '+n+'\nProtocolo: '+cpr+'\nInscrição: '+c.nome+' ('+R(c.preco)+') via '+forma+'\nSegue o comprovante do pagamento:';
+  $('cmd').innerHTML=`<div class="ch"><img src="${document.querySelector('.logo').src}" style="width:64px;height:64px;border-radius:12px"><div><h1>Comprovante de inscrição</h1><div>${esc(CONFIG.nome)}</div></div></div>
+<div style="text-align:center;margin:8px 0 16px"><span class="cst">⏳ AGUARDANDO CONFIRMAÇÃO DO PAGAMENTO</span></div>
+<div class="cg"><div class="s2"><label>Participante</label><b style="font-size:16px">${esc(n)}</b></div><div><label>Protocolo</label><b>${cpr}</b></div><div><label>Registrado em</label>${dt}</div><div><label>Inscrição</label>${esc(c.nome)}</div><div><label>Valor</label><b>${R(c.preco)}</b></div><div><label>Forma de pagamento</label>${esc(forma)}</div><div><label>WhatsApp</label>${esc($('pTel').value)}</div></div>
+<div class="cb"><b>${esc(CONFIG.data)}</b><br>${esc(CONFIG.local)}</div>
+<p style="font-size:11px;color:#333;margin:0">Este documento registra a sua inscrição e não comprova o pagamento. Assim que a organização confirmar o valor recebido, você recebe o comprovante de pagamento confirmado pelo WhatsApp. Para agilizar, envie o comprovante do banco ou do cartão.</p>`;
+  document.body.classList.add('pc');$('cm').style.display='block'}
+$('pGerar').onclick=gerarCompr;
+$('cClose').onclick=()=>{$('cm').style.display='none';document.body.classList.remove('pc')};
+$('cPrint').onclick=()=>{try{print()}catch(e){toast('Use “Baixar arquivo” ou tire um print da tela.')}};
+$('cZap').onclick=()=>window.open('https://wa.me/'+CONFIG.whatsapp+'?text='+encodeURIComponent(cmsg),'_blank','noopener');
+$('cDown').onclick=()=>{const h='<!DOCTYPE html><html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Comprovante de inscrição</title><style>body{margin:16px;background:#fff}'+CCSS+'</style><div id="cmd">'+$('cmd').innerHTML+'</div></html>';
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([h],{type:'text/html'}));a.download='comprovante-inscricao-'+cpr+'.html';document.body.appendChild(a);a.click();a.remove()};
 function abrirPix(c){$('pixv').textContent=R(c.preco);$('pixc').textContent=c.pix;
   const q=$('qr');q.innerHTML='';try{new QRCode(q,{text:c.pix,width:220,height:220,correctLevel:QRCode.CorrectLevel.M})}catch(e){q.textContent='Use o código abaixo.'}
   $('pixb').onclick=()=>{try{navigator.clipboard.writeText(c.pix).then(()=>toast('Código Pix copiado ✔')).catch(()=>toast('Selecione e copie o código manualmente.'))}catch(e){toast('Selecione e copie o código manualmente.')}};
