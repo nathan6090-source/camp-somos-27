@@ -86,7 +86,7 @@ const CONFIG = {
   <div class="grid" id="comboGrid"></div>
   <p style="color:var(--mut);font-size:.85rem;margin-top:14px">Pagamento seguro, processado pela Stone. Dúvidas? <a id="zap" target="_blank" rel="noopener">Fale no WhatsApp</a>.</p>
   <div class="card" style="margin-top:22px"><h3>Já fez o pagamento?</h3><p style="color:var(--mut)">Gere agora o seu comprovante de inscrição. A confirmação do pagamento é feita pela organização, e você recebe o comprovante confirmado pelo WhatsApp.</p>
-  <form class="f2" onsubmit="return false"><input id="pNome" placeholder="Nome completo" autocomplete="name"><input id="pTel" placeholder="Seu WhatsApp com DDD" inputmode="tel" autocomplete="tel"><select id="pForma"><option>Cartão de crédito</option><option>Pix</option></select><button class="btn" id="pGerar">Gerar comprovante</button></form></div>
+  <form class="f2" onsubmit="return false"><input id="pNome" placeholder="Nome completo" autocomplete="name"><input id="pTel" placeholder="Seu WhatsApp com DDD" inputmode="tel" autocomplete="tel"><input id="pNasc" placeholder="Nascimento (dd/mm/aaaa)" inputmode="numeric" maxlength="10"><select id="pIgreja"><option>Igreja Vida</option><option>Outra</option></select><input id="pOutra" placeholder="Qual igreja?" style="display:none"><select id="pForma"><option>Cartão de crédito</option><option>Pix</option></select><button class="btn" id="pGerar">Gerar comprovante</button></form></div>
 </div></section>
 
 <section><div class="wrap"><h2>Perguntas frequentes</h2><div id="faq"></div></div></section>
@@ -130,17 +130,24 @@ document.head.appendChild(Object.assign(document.createElement('style'),{textCon
 let cpr='',cmsg='';
 function gerarCompr(){const n=$('pNome').value.trim(),t=$('pTel').value.replace(/\D/g,'');
   if(n.length<5||t.length<10){toast('Informe nome completo e WhatsApp com DDD.');return}
+  const nasc=$('pNasc').value.trim(),mm=nasc.match(/^(\d{2})\/(\d{2})\/(\d{4})$/),ig=$('pIgreja').value==='Outra'?$('pOutra').value.trim():'Igreja Vida',bd=mm?new Date(+mm[3],+mm[2]-1,+mm[1]):null,hoje=new Date();
+  if(!bd||bd.getDate()!==+mm[1]||bd>hoje||+mm[3]<1930){toast('Informe a data de nascimento no formato dd/mm/aaaa.');return}
+  if(!ig){toast('Informe o nome da sua igreja.');return}
+  let idade=hoje.getFullYear()-bd.getFullYear();if(hoje<new Date(hoje.getFullYear(),bd.getMonth(),bd.getDate()))idade--;
   const forma=$('pForma').value,c=combos.find(x=>forma==='Pix'?x.pix:!x.pix)||combos[0];
   cpr='S27-'+Date.now().toString(36).slice(-4).toUpperCase()+Math.random().toString(36).slice(2,4).toUpperCase();
   const dt=new Date().toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'});
-  cmsg='Olá! Fiz minha inscrição no '+CONFIG.nome+'.\nNome: '+n+'\nProtocolo: '+cpr+'\nInscrição: '+c.nome+' ('+R(c.preco)+') via '+forma+'\nSegue o comprovante do pagamento:';
+  cmsg='Olá! Fiz minha inscrição no '+CONFIG.nome+'.\nNome: '+n+'\nNascimento: '+nasc+' ('+idade+' anos)\nIgreja: '+ig+'\nProtocolo: '+cpr+'\nInscrição: '+c.nome+' ('+R(c.preco)+') via '+forma+(idade<18?'\nMenor de idade: levarei a autorização dos meus responsáveis.':'')+'\nSegue o comprovante do pagamento:';
   $('cmd').innerHTML=`<div class="ch"><img src="${document.querySelector('.logo').src}" style="width:64px;height:64px;border-radius:12px"><div><h1>Comprovante de inscrição</h1><div>${esc(CONFIG.nome)}</div></div></div>
 <div style="text-align:center;margin:8px 0 16px"><span class="cst">⏳ AGUARDANDO CONFIRMAÇÃO DO PAGAMENTO</span></div>
-<div class="cg"><div class="s2"><label>Participante</label><b style="font-size:16px">${esc(n)}</b></div><div><label>Protocolo</label><b>${cpr}</b></div><div><label>Registrado em</label>${dt}</div><div><label>Inscrição</label>${esc(c.nome)}</div><div><label>Valor</label><b>${R(c.preco)}</b></div><div><label>Forma de pagamento</label>${esc(forma)}</div><div><label>WhatsApp</label>${esc($('pTel').value)}</div></div>
+<div class="cg"><div class="s2"><label>Participante</label><b style="font-size:16px">${esc(n)}</b></div><div><label>Protocolo</label><b>${cpr}</b></div><div><label>Registrado em</label>${dt}</div><div><label>Inscrição</label>${esc(c.nome)}</div><div><label>Valor</label><b>${R(c.preco)}</b></div><div><label>Forma de pagamento</label>${esc(forma)}</div><div><label>WhatsApp</label>${esc($('pTel').value)}</div><div><label>Nascimento</label>${esc(nasc)} (${idade} anos)</div><div><label>Igreja</label>${esc(ig)}</div></div>
 <div class="cb"><b>${esc(CONFIG.data)}</b><br>${esc(CONFIG.local)}</div>
+${idade<18?'<div class="cb" style="background:#fee2e2;color:#991b1b"><b>Menor de idade:</b> é necessária a autorização dos responsáveis.</div>':''}
 <p style="font-size:11px;color:#333;margin:0">Este documento registra a sua inscrição e não comprova o pagamento. Assim que a organização confirmar o valor recebido, você recebe o comprovante de pagamento confirmado pelo WhatsApp. Para agilizar, envie o comprovante do banco ou do cartão.</p>`;
   document.body.classList.add('pc');$('cm').style.display='block'}
 $('pGerar').onclick=gerarCompr;
+$('pIgreja').onchange=()=>$('pOutra').style.display=$('pIgreja').value==='Outra'?'':'none';
+$('pNasc').oninput=e=>{const d=e.target.value.replace(/\D/g,'').slice(0,8);e.target.value=d.length>4?d.slice(0,2)+'/'+d.slice(2,4)+'/'+d.slice(4):d.length>2?d.slice(0,2)+'/'+d.slice(2):d};
 $('cClose').onclick=()=>{$('cm').style.display='none';document.body.classList.remove('pc')};
 $('cPrint').onclick=()=>{try{print()}catch(e){toast('Use “Baixar arquivo” ou tire um print da tela.')}};
 $('cZap').onclick=()=>window.open('https://wa.me/'+CONFIG.whatsapp+'?text='+encodeURIComponent(cmsg),'_blank','noopener');
