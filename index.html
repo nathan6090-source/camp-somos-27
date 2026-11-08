@@ -48,7 +48,7 @@ const CONFIG = {
   instagram: "https://www.instagram.com/somos.aux",
   // Seus combos. "link" = link de pagamento (cartão/Pix) de cada combo
   combos: [
-    {nome: "Crédito individual", desc: "1 vaga • cartão de crédito parcelado", preco: 250, botao: "💳 Pagar com cartão", link: "https://www.asaas.com/000/c/32xzfszpkpy155l5"},
+    {nome: "Crédito individual", desc: "1 vaga • cartão de crédito parcelado", preco: 260, botao: "💳 Pagar com cartão", link: "https://link.picpay.com/p/17941639786af0c50adb8a9"},
     {nome: "Pix individual", desc: "1 vaga • pagamento à vista via Pix", preco: 240, botao: "Pagar com Pix", link: "", pix: "00020126960014br.gov.bcb.pix013639693efb-d415-44c7-8af8-909a44c6727e0234INSCRICAO INDIVIDUAL CAMP SOMOS 275204000053039865406240.005802BR5925Caio Gabriel Cardoso da S6009Araguaina62290525CAIOGABR00000738944381ASA6304F16A"}
   ],
   programacao: [
@@ -84,7 +84,7 @@ const CONFIG = {
 
 <section id="combos"><div class="wrap"><h2>Escolha seu método de pagamento</h2>
   <div class="grid" id="comboGrid"></div>
-  <p style="color:var(--mut);font-size:.85rem;margin-top:14px">Pagamento seguro, processado pela Stone. Dúvidas? <a id="zap" target="_blank" rel="noopener">Fale no WhatsApp</a>.</p>
+  <p style="color:var(--mut);font-size:.85rem;margin-top:14px">Pagamento seguro. Dúvidas? <a id="zap" target="_blank" rel="noopener">Fale no WhatsApp</a>.</p>
   <div class="card" id="cadastro" style="margin-top:22px"><h3>Já fez o pagamento?</h3><p style="color:var(--mut)">Gere agora o seu comprovante de inscrição. A confirmação do pagamento é feita pela organização, e você recebe o comprovante confirmado pelo WhatsApp.</p>
   <form class="f2" onsubmit="return false"><input id="pNome" placeholder="Nome completo" autocomplete="name"><input id="pTel" placeholder="Seu WhatsApp com DDD" inputmode="tel" autocomplete="tel"><input id="pNasc" placeholder="Nascimento (dd/mm/aaaa)" inputmode="numeric" maxlength="10"><select id="pIgreja"><option>Igreja Vida</option><option>Outra</option></select><input id="pOutra" placeholder="Qual igreja?" style="display:none"><select id="pForma"><option>Cartão de crédito</option><option>Pix</option></select><button class="btn" id="pGerar">Gerar comprovante</button></form></div>
 </div></section>
