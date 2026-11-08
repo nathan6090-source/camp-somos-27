@@ -85,7 +85,7 @@ const CONFIG = {
 <section id="combos"><div class="wrap"><h2>Escolha seu método de pagamento</h2>
   <div class="grid" id="comboGrid"></div>
   <p style="color:var(--mut);font-size:.85rem;margin-top:14px">Pagamento seguro, processado pela Stone. Dúvidas? <a id="zap" target="_blank" rel="noopener">Fale no WhatsApp</a>.</p>
-  <div class="card" style="margin-top:22px"><h3>Já fez o pagamento?</h3><p style="color:var(--mut)">Gere agora o seu comprovante de inscrição. A confirmação do pagamento é feita pela organização, e você recebe o comprovante confirmado pelo WhatsApp.</p>
+  <div class="card" id="cadastro" style="margin-top:22px"><h3>Já fez o pagamento?</h3><p style="color:var(--mut)">Gere agora o seu comprovante de inscrição. A confirmação do pagamento é feita pela organização, e você recebe o comprovante confirmado pelo WhatsApp.</p>
   <form class="f2" onsubmit="return false"><input id="pNome" placeholder="Nome completo" autocomplete="name"><input id="pTel" placeholder="Seu WhatsApp com DDD" inputmode="tel" autocomplete="tel"><input id="pNasc" placeholder="Nascimento (dd/mm/aaaa)" inputmode="numeric" maxlength="10"><select id="pIgreja"><option>Igreja Vida</option><option>Outra</option></select><input id="pOutra" placeholder="Qual igreja?" style="display:none"><select id="pForma"><option>Cartão de crédito</option><option>Pix</option></select><button class="btn" id="pGerar">Gerar comprovante</button></form></div>
 </div></section>
 
@@ -98,7 +98,9 @@ const CONFIG = {
 </div>
 
 <style>#pixm{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;padding:20px;z-index:20}#pixm .box{background:var(--card);border-radius:24px;padding:26px 22px;max-width:380px;width:100%;text-align:center;max-height:100%;overflow:auto}#qr{background:#fff;padding:12px;border-radius:14px;display:inline-block;margin:12px 0}#pixc{word-break:break-all;font-size:.72rem;color:var(--mut);background:#0b0d10;border-radius:10px;padding:10px;margin:10px 0;max-height:80px;overflow:auto}</style>
-<div id="pixm" onclick="if(event.target===this)this.style.display='none'"><div class="box"><h3 style="margin:0">Pagar com Pix</h3><div class="price" id="pixv" style="font-size:2rem"></div><div id="qr"></div><div id="pixc"></div><button class="btn" id="pixb">Copiar código Pix</button> <button class="btn alt" onclick="document.getElementById('pixm').style.display='none'">Fechar</button><p style="color:var(--mut);font-size:.8rem;margin:12px 0 0">No app do seu banco, escolha Pix e leia o QR Code ou use “Pix copia e cola”. Depois envie o comprovante pelo WhatsApp.</p></div></div>
+<div id="pixm" onclick="if(event.target===this)this.style.display='none'"><div class="box"><h3 style="margin:0">Pagar com Pix</h3><div class="price" id="pixv" style="font-size:2rem"></div><div id="qr"></div><div id="pixc"></div><button class="btn" id="pixb">Copiar código Pix</button> <button class="btn alt" onclick="document.getElementById('pixm').style.display='none'">Fechar</button><div class="avs"><b>⚠ Depois de pagar, preencha o seu cadastro.</b><br>Sem o cadastro a organização não consegue confirmar a sua inscrição.</div><button class="btn" style="width:100%;margin-top:8px" onclick="irCadastro('Pix')">Já paguei — preencher cadastro</button><p style="color:var(--mut);font-size:.8rem;margin:12px 0 0">No app do seu banco, escolha Pix e leia o QR Code ou use “Pix copia e cola”. Depois envie o comprovante pelo WhatsApp.</p></div></div>
+<style>.avs{background:#3b2a05;border:1px solid #ffaa0a;color:#ffd98a;border-radius:12px;padding:10px 12px;font-size:.85rem;margin-top:8px;text-align:left}#cardm{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;padding:20px;z-index:20}#cardm .box{background:var(--card);border-radius:24px;padding:26px 22px;max-width:380px;width:100%;text-align:center}#cadastro.hl{box-shadow:0 0 0 3px #ffaa0a}</style>
+<div id="cardm" onclick="if(event.target===this)this.style.display='none'"><div class="box"><h3 style="margin:0">Pagamento no cartão</h3><p style="color:var(--mut)">A página de pagamento abriu em outra aba.</p><div class="avs"><b>⚠ Depois de pagar, volte aqui e preencha o seu cadastro.</b><br>Sem o cadastro a organização não consegue confirmar a sua inscrição.</div><button class="btn" style="width:100%;margin-top:12px" onclick="irCadastro('Cartão de crédito')">Já paguei — preencher cadastro</button> <button class="btn alt" style="width:100%;margin-top:8px" onclick="document.getElementById('cardm').style.display='none'">Fechar</button></div></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>.f2{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-top:12px}.f2 input,.f2 select{width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:#0b0d10;color:var(--txt);font:inherit;font-size:.9rem}
 #cm{position:fixed;inset:0;background:#0b0d10;display:none;overflow:auto;z-index:60;padding:0 16px 16px}#cm .bar{position:sticky;top:0;z-index:2;background:#0b0d10;max-width:620px;margin:0 auto 12px;padding:12px 0;display:flex;gap:8px;flex-wrap:wrap}
@@ -172,7 +174,9 @@ function abrirPix(c){$('pixv').textContent=R(c.preco);$('pixc').textContent=c.pi
   $('pixm').style.display='flex'}
 function pagar(i){if(combos[i].pix)return abrirPix(combos[i]);const u=combos[i].link;
   if(!u){toast('Link de pagamento ainda não configurado.');return}
-  window.open(u,'_blank','noopener')}
+  window.open(u,'_blank','noopener');$('cardm').style.display='flex'}
+function irCadastro(f){$('pixm').style.display='none';$('cardm').style.display='none';$('pForma').value=f;const c=$('cadastro');c.scrollIntoView({behavior:'smooth',block:'center'});c.classList.add('hl');setTimeout(()=>c.classList.remove('hl'),2500);setTimeout(()=>$('pNome').focus({preventScroll:true}),600)}
+if(location.hash==='#cadastro')setTimeout(()=>irCadastro('Cartão de crédito'),400);
 renderCombos();
 
 </script>
